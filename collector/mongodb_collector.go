@@ -38,6 +38,7 @@ type MongodbCollectorOpts struct {
 	TLSPrivateKeyFile     string
 	TLSCaFile             string
 	TLSHostnameValidation bool
+    DatabaseName          string
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -184,6 +185,14 @@ func (exporter *MongodbCollector) collectMongos(session *mgo.Session, ch chan<- 
 		serverStatus.Export(ch)
 	}
 
+    log.Debug("Collecting DB Count")
+    if exporter.Opts.DatabaseName != "" {
+        dbCountResult := shared.GetDBCountResult(session, exporter.Opts.DatabaseName)
+        if dbCountResult != nil {
+            dbCountResult.Export(ch)
+        }
+    }
+
 	log.Debug("Collecting Sharding Status")
 	shardingStatus := collector_mongos.GetShardingStatus(session)
 	if shardingStatus != nil {
@@ -197,6 +206,14 @@ func (exporter *MongodbCollector) collectMongod(session *mgo.Session, ch chan<- 
 	if serverStatus != nil {
 		serverStatus.Export(ch)
 	}
+
+    log.Debug("Collecting DB Count")
+    if exporter.Opts.DatabaseName != "" {
+        dbCountResult := shared.GetDBCountResult(session, exporter.Opts.DatabaseName)
+        if dbCountResult != nil {
+            dbCountResult.Export(ch)
+        }
+    }
 }
 
 func (exporter *MongodbCollector) collectMongodReplSet(session *mgo.Session, ch chan<- prometheus.Metric) {

@@ -62,6 +62,7 @@ var (
 		"    \tIf provided: MongoDB servers connecting to should present a certificate signed by one of this CAs.\n"+
 		"    \tIf not provided: System default CAs are used.")
 	tlsDisableHostnameValidationF = flag.Bool("mongodb.tls-disable-hostname-validation", false, "Do hostname validation for server connection.")
+    databaseF = flag.String("mongodb.db", "", "Name for database to count collections.")
 
 	// FIXME currently ignored
 	enabledGroupsFlag = flag.String("groups.enabled", "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics", "Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/")
@@ -218,6 +219,7 @@ func registerCollector() {
 		TLSPrivateKeyFile:     *tlsPrivateKeyF,
 		TLSCaFile:             *tlsCAF,
 		TLSHostnameValidation: !(*tlsDisableHostnameValidationF),
+        DatabaseName: *databaseF,
 	})
 	prometheus.MustRegister(mongodbCollector)
 }
